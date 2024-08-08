@@ -5,7 +5,7 @@ const Error = () => {
   console.log("error", error);
   return (
     <div>
-      <h1>Error Page</h1>
+      <h1 className="underline">Error Page</h1>
       <Link to={"/"}>Go back</Link>
     </div>
   );
