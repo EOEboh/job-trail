@@ -1,7 +1,12 @@
+import "express-async-errors"; // best at the very top
 import * as dotenv from "dotenv"; // best at the very top
 dotenv.config();
 import express from "express";
 import morgan from "morgan";
+import jobRouter from "./routes/jobRouter.js";
+import mongoose from "mongoose";
+import errorHandlerMiddleware from "./middleware/errorHandlerMiddleware.js";
+import { body, validationResult } from "express-validator";
 
 const app = express();
 
@@ -11,20 +16,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-// GET All Jobs
-app.get("/api/v1/jobs");
-
-// Create A Job
-app.post("/api/v1/jobs");
-
-// Get A Single Job
-app.get(`/api/v1/jobs/:id`);
-
-// Edit Job
-app.patch("/api/v1/jobs/:id");
-
-// Delete Job
-app.delete("/api/v1/jobs/:id");
+app.use("/api/v1/jobs", jobRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World");
@@ -43,13 +35,16 @@ app.use("*", (req, res) => {
 });
 
 // middleware error route for errors during processing
-app.use((err, req, res, next) => {
-  console.log("err", err);
-  res.status(500).json({ msg: "something went wrong" });
-});
+app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 5000;
 
-app.listen(4000, () => {
-  console.log(`Server is working on port ${port}`);
-});
+try {
+  await mongoose.connect(process.env.MONGO_URI);
+  app.listen(4000, () => {
+    console.log(`Server is working on port ${port}`);
+  });
+} catch (error) {
+  console.log("DB Connection Error", error);
+  process.exit(1);
+}

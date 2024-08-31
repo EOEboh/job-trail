@@ -9,3 +9,8 @@ import {
   editAJob,
   deleteAJob,
 } from "../controllers/jobControllers.js";
+
+router.route("/").get(getAllJobs).post(createAJob);
+router.route("/:id").get(getSingleJob).patch(editAJob).delete(deleteAJob);
+
+export default router;
