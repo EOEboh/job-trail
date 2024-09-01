@@ -9,8 +9,17 @@ import {
   editAJob,
   deleteAJob,
 } from "../controllers/jobControllers.js";
+import {
+  validateJobInput,
+  validateIdParam,
+} from "../middleware/validationMiddleware.js";
 
-router.route("/").get(getAllJobs).post(createAJob);
-router.route("/:id").get(getSingleJob).patch(editAJob).delete(deleteAJob);
+// add validateJobInput to the controllers that require a body request! (POST & PATCH)
+router.route("/").get(getAllJobs).post(validateJobInput, createAJob);
+router
+  .route("/:id")
+  .get(validateIdParam, getSingleJob)
+  .patch(validateJobInput, validateIdParam, editAJob)
+  .delete(validateIdParam, deleteAJob);
 
 export default router;
